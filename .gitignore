@@ -2,4 +2,4 @@ fas-bach/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
-data/processed/
+data/
