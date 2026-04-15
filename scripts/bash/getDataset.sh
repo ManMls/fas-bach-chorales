@@ -4,7 +4,6 @@
 archive1=bach-chorale-harmony-data.zip
 url1=https://www.kaggle.com/api/v1/datasets/download/lsind18/bach-chorale-harmony-data
 data1=bach_choral_set_dataset.csv
-out=bach_dataset.data
 
 # Fallback source
 archive2=bach+choral+harmony.zip
@@ -13,7 +12,9 @@ data2=jsbach_chorals_harmony.data
 
 # Paths
 tmpDir=tmp/
-dataDir=../../data/raw
+dataDir=../../data/raw/
+
+outFile=bach_chorales.dataset
 
 cleanup() {
     rm -rf "$tmpDir"
@@ -44,8 +45,8 @@ download_and_extract () {
     fi
 
     if [ -f "$tmpDir$data" ]; then
-        echo "Sposto il file in $dataDir$out"
-        if mv "$tmpDir$data" "$dataDir$out"; then
+        echo "Sposto il file in $dataDir$outFile"
+        if mv "$tmpDir$data" "$dataDir$outFile"; then
             echo -e "\tTutto pronto"
             return 0
         else
@@ -75,7 +76,7 @@ if download_and_extract "$url2" "$archive2" "$data2"; then
     exit 0
 else
     echo "Entrambi i download sono falliti. :/"
-    echo "Prova a scaricare uno dei dataset manualmente ed inseriscilo in $dataDir/$out"
+    echo "Prova a scaricare uno dei dataset manualmente ed inseriscilo in $dataDir$outFile"
     cleanup
     exit 1
 fi

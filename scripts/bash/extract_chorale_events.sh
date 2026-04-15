@@ -1,9 +1,12 @@
 #!/bin/env bash
 
-DATASET="../../data/raw/jsbach_chorals_harmony.data"
-OUTDIR="../../data/processed/"
+data=bach_chorales.dataset
 
-csvcut -c 1,3-14 "$DATASET" | tail -n +2 | sed -e 's/YES/1/g' -e 's/NO/0/g' | awk -F',' -v out="$OUTDIR" '
+dataDir=../../data/
+rawDir=$dataDir"raw/"
+outDir=$dataDir"processed/"
+
+csvcut -c 1,3-14 "$rawDir$data" | tail -n +2 | sed -e 's/YES/1/g' -e 's/NO/0/g' | awk -F',' -v out="$outDir" '
 {
     file = out $1
     $1 = ""
