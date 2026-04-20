@@ -1,49 +1,59 @@
 #!/usr/bin/env python3 
 import os 
 import numpy as np 
+import pitch_utils as pu
 
 # data from https://tunableapp.com/temperaments/werckmeister-iii/ 
 freq = [ 
     261.626, #C4 
-    277.183, #Db4 
+    277.183, #C#4, Db4 
     293.665, #D4 
-    311.127, #Eb4 
+    311.127, #D#4, Eb4 
     329.628, #E4 
     349.228, #F4 
-    369.994, #Gb4 
+    369.994, #F#4, Gb4 
     391.995, #G4 
-    415.305, #Ab4
+    415.305, #G#4, Ab4
     440.000, #A4 
-    466.164, #Bb4 
+    466.164, #A#4, Bb4 
     493.883  #B4 
 ] 
 
-# Uncomment for 12-TET instead of the above (baroque temperament) 
+#Uncomment for 12-TET instead of the above (baroque temperament) 
 #f0 = 261.625565 # C4 
 #n = np.arange(12) # 12 semitones 
 #freq = f0 * (2 ** (n / 12)) 
 
-def synthesize(chorale_df, freq, pitch_cols, sampleRate=44100, eventTime=2.5):
+def compute_signal(frequency, t, harmonics=1, alpha=1):
+    signal = 0.0
+    for n in range(1, harmonics+1):
+        amplitude = np.exp(-alpha * (n-1)) 
+        signal += amplitude * np.sin(2 * np.pi * frequency * n * t) 
+    return signal
+
+def synthesize(chorale_df, pitch_cols, bass_col, sampleRate=44100, eventTime=2):
     N = int(sampleRate * eventTime)
     t = np.arange(N) / sampleRate
 
-    fade = int(0.1 * sampleRate) 
+    fade = int(0.05 * sampleRate)
     attack = np.linspace(0, 1, fade) 
     sustain = np.ones(N - 2 * fade) 
-    release = np.linspace(1, 0, fade) 
+    release = np.linspace(1, 0, fade)
     envelope = np.concatenate([attack, sustain, release])
     
     audio = [] 
-
     for _, row in chorale_df.iterrows(): 
         signal = np.zeros(N) 
 
         for i, active in enumerate(row[pitch_cols].values): 
             if active: 
-                signal += np.sin(2 * np.pi * freq[i] * t) 
+                signal += compute_signal(freq[i], t)
+        
+        bass = pu.pitch_class(row[bass_col])
+        signal += compute_signal(freq[bass]/4, t)
 
-        signal /= np.max(np.abs(signal) + 1e-9) 
-        signal *= envelope 
+        signal /= np.max(np.abs(signal) + 1e-9)
+        signal *= envelope
         audio.append(signal)
 
     audio = np.concatenate(audio) 
