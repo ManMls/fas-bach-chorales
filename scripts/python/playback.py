@@ -24,7 +24,7 @@ freq = [
 #n = np.arange(12) # 12 semitones 
 #freq = f0 * (2 ** (n / 12)) 
 
-def compute_signal(frequency, t, harmonics=1, alpha=1):
+def compute_signal(frequency, t, harmonics=3, alpha=0.8):
     signal = 0.0
     for n in range(1, harmonics+1):
         amplitude = np.exp(-alpha * (n-1)) 
@@ -41,16 +41,19 @@ def synthesize(chorale_df, pitch_cols, bass_col, sampleRate=44100, eventTime=2):
     release = np.linspace(1, 0, fade)
     envelope = np.concatenate([attack, sustain, release])
     
+    bass_gain = 1.3
     audio = [] 
     for _, row in chorale_df.iterrows(): 
         signal = np.zeros(N) 
-
+        
+        # Computes pitches columns
         for i, active in enumerate(row[pitch_cols].values): 
             if active: 
                 signal += compute_signal(freq[i], t)
         
-        bass = pu.pitch_class(row[bass_col])
-        signal += compute_signal(freq[bass]/4, t)
+        # Computes bass column
+        bass_idx = pu.pitch_class(row[bass_col])
+        signal += bass_gain * compute_signal(freq[bass_idx]/4, t, 5, 1)
 
         signal /= np.max(np.abs(signal) + 1e-9)
         signal *= envelope

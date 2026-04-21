@@ -1,5 +1,2 @@
-- fix graphs with too many values (ex.: 012606bv, 001106b_, ecc...)
 - add another graph / stats / 
-    global pieces leaderboard ?
-        V-I cadences count ?
-- make 1st graph in notebook interactive? (modify timestamp from chord /inversion sequence)
+- docker
