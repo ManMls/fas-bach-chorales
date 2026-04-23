@@ -59,19 +59,17 @@ def synthesize(chorale_df, pitch_cols, bass_col, sampleRate=44100, eventTime=2):
         signal *= envelope
         audio.append(signal)
 
-    audio = np.concatenate(audio) 
+    audio = np.concatenate(audio)
     audio /= np.max(np.abs(audio) + 1e-9) 
     return audio 
 
-def get_audio(chorale_id, df, pitch_cols, dataDir):
+def get_audio(df, chorale_id, pitch_cols, bass_col, dataDir):
     cache_path = os.path.join(dataDir, f"cache/chorale_{chorale_id}.npy")
-
-    chorale = df[df["chorale_ID"] == chorale_id]
-
+    
     if os.path.exists(cache_path):
         return np.load(cache_path)
 
-    audio = synthesize(chorale, freq, pitch_cols)
+    audio = synthesize(df, pitch_cols, bass_col)
     
     os.makedirs(os.path.dirname(cache_path), exist_ok=True)
     np.save(cache_path, audio)
