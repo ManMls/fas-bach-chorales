@@ -1,9 +1,10 @@
 #!/usr/bin/env python3 
+
 import os 
 import numpy as np 
 import pitch_utils as pu
 
-# data from https://tunableapp.com/temperaments/werckmeister-iii/ 
+# values from https://tunableapp.com/temperaments/werckmeister-iii/ 
 freq = [ 
     261.626, #C4 
     277.183, #C#4, Db4 
@@ -19,15 +20,10 @@ freq = [
     493.883  #B4 
 ] 
 
-#Uncomment for 12-TET instead of the above (baroque temperament) 
-#f0 = 261.625565 # C4 
-#n = np.arange(12) # 12 semitones 
-#freq = f0 * (2 ** (n / 12)) 
-
 def compute_signal(frequency, t, harmonics=3, alpha=0.8):
     signal = 0.0
     for n in range(1, harmonics+1):
-        amplitude = np.exp(-alpha * (n-1)) 
+        amplitude = np.exp(-alpha * (n - 1)) 
         signal += amplitude * np.sin(2 * np.pi * frequency * n * t) 
     return signal
 
@@ -53,7 +49,7 @@ def synthesize(chorale_df, pitch_cols, bass_col, sampleRate=44100, eventTime=2):
         
         # Computes bass column
         bass_idx = pu.pitch_class(row[bass_col])
-        signal += bass_gain * compute_signal(freq[bass_idx]/4, t, 5, 1)
+        signal += bass_gain * compute_signal(freq[bass_idx]/4, t)
 
         signal /= np.max(np.abs(signal) + 1e-9)
         signal *= envelope
@@ -70,7 +66,7 @@ def get_audio(df, chorale_id, pitch_cols, bass_col, dataDir):
         return np.load(cache_path)
 
     audio = synthesize(df, pitch_cols, bass_col)
-    
+
     os.makedirs(os.path.dirname(cache_path), exist_ok=True)
     np.save(cache_path, audio)
 
