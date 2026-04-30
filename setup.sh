@@ -4,6 +4,6 @@ python -m venv fas-bach
 source fas-bach/bin/activate
 pip install -r requirements.txt
 
-./scripts/getDataset.sh
+./scripts/bash/getDataset.sh
 
 jupyter-notebook
