@@ -12,7 +12,7 @@ data2=jsbach_chorals_harmony.data
 
 # Paths
 tmpDir=tmp/
-dataDir=../../data/raw/
+dataDir=data/raw/
 
 outFile=bach_chorales.dataset
 
